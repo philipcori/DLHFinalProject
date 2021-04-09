@@ -2,11 +2,15 @@ import csv
 import os
 import pickle
 
-data_root_dir = './original data/covid-chestxray-dataset'
-image_root_dir = './original data/covid-chestxray-dataset/images'
+#data_root_dir = './original data/covid-chestxray-dataset'
+#image_root_dir = './original data/covid-chestxray-dataset/images'
+data_root_dir = os.path.join(os.getcwd(), 'original data', 'covid-chestxray-dataset')
+image_root_dir = os.path.join(os.getcwd(), 'original data', 'covid-chestxray-dataset', 'images')
+
 info_file_name = 'metadata.csv'
 
 info_path = os.path.join(data_root_dir, info_file_name)
+
 
 data_dict = {}
 
@@ -130,7 +134,7 @@ print (v0, v1, v2, v3)
 print (w0, w1, w2, w3)
 #pickle.dump(data_dict, open('./data_preprocess/formal_covid_dict_ap.pkl','wb'))
 ##pickle.dump(pa_list, open('pa_list.pkl','wb'))
-saved_path = os.path.join(os.getcwd(), "data_preprocess", "formal_covid_dict_ap.pkl")
+saved_path = os.path.join(os.getcwd(), "data_preprocess", "formal_covid_dict.pkl")
 print(saved_path)
 #'./data_preprocess/formal_covid_dict.pkl'
 if os.path.exists(saved_path):
