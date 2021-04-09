@@ -1,7 +1,7 @@
 import os.path
-from data.base_dataset import BaseDataset, get_params, get_transform, get_transform_augumentation
+from .base_dataset import BaseDataset, get_params, get_transform, get_transform_augumentation
 #from data.image_folder import make_dataset, make_label_dict
-from data.image_folder import parse_data_dict
+from .image_folder import parse_data_dict
 from PIL import Image
 import numpy as np
 import torch

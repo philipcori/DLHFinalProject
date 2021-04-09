@@ -46,7 +46,7 @@ parser.add_argument('--experimentID', default='%s_20200407_multiclass_cv5', type
 
 # Datasets
 parser.add_argument('-d', '--data', default=
-                    './data_preprocess/standard_data_multiclass_0407_crossentropy/exp_%s_list_cv5.pkl', type=str)
+                    './data_preprocess/standard_data_multiclass_0922_crossentropy/exp_%s_list_cv5.pkl', type=str)
 parser.add_argument('--label_file', default='./exp_data/metadata.csv', type=str)
 parser.add_argument('-j', '--workers', default=1, type=int, metavar='N',
                     help='number of data loading workers (default: 4)')

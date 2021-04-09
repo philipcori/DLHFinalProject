@@ -18,7 +18,7 @@ for key, value in formal_covid_dict.items():
       else:
           negative_case_list_covid.append((info['path'], key+'_'+image_name, 0))
       
-formal_xray_dict = pickle.load(open('./data_preprocess/formal_xray_dict.pkl','rb'))
+formal_xray_dict = pickle.load(open('./data_preprocess/formal_kaggle_dict.pkl','rb'))
 for key, value in formal_xray_dict.items():
   for image_name, info in value['image_dict'].items():
     if 'AP' or 'PA' in info['type']:

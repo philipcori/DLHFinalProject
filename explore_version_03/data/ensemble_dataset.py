@@ -76,21 +76,21 @@ def parse_data_dict(f_dir, cv, runtype):
 #    all_matrix.append(temp_matrix)
   features_l = np.concatenate(all_predict_v, 1)
   
-#  all_predict_v = []
-#  for model in model_list:
-#    predict_v = []
-#    sub_dir = './explore_version_03/results/%s_20200407_multiclass_%s'%(model, cv)
-#    filename = 'result_detail_%s_%s_%s.csv'%(model, runtype, cv)
-#    print(filename)
-#    filepath = os.path.join(sub_dir, filename)
-#    with open(filepath,'r') as f:
-#      csv_reader = csv.reader(f)
-#      for row in csv_reader:
-#        xxx = np.array([float(x) for x in row[4:]])
-#        predict_v.append(xxx)
-#    all_predict_v.append(np.array(predict_v))
-#  features_f = np.concatenate(all_predict_v, 1)
-#  features = np.concatenate([features_l, features_f], 1)
+ all_predict_v = []
+ for model in model_list:
+   predict_v = []
+   sub_dir = './explore_version_03/results/%s_20200407_multiclass_%s'%(model, cv)
+   filename = 'result_detail_%s_%s_%s.csv'%(model, runtype, cv)
+   print(filename)
+   filepath = os.path.join(sub_dir, filename)
+   with open(filepath,'r') as f:
+     csv_reader = csv.reader(f)
+     for row in csv_reader:
+       xxx = np.array([float(x) for x in row[4:]])
+       predict_v.append(xxx)
+   all_predict_v.append(np.array(predict_v))
+ features_f = np.concatenate(all_predict_v, 1)
+ features = np.concatenate([features_l, features_f], 1)
 #  print (np.shape(features))
   labels = np.array(labels)
 #  print (np.shape(features), np.shape(labels))

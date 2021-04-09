@@ -130,4 +130,10 @@ dmypy.json
 
 .idea/
 chest_xray/
+covid-chestxray-dataset/
 *.pkl
+.DS_Store
+checkpoint/
+standard_data_augmentation_0405/
+standard_data_multiclass_0325/
+standard_data_multiclass_0922_crossentropy/
