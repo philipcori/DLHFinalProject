@@ -19,7 +19,9 @@ from explore_version_03.models import imagenet as customized_models
 from explore_version_03.data.xray_dataset_0328 import XrayDataset
 from explore_version_03.utils import Bar, AverageMeter, accuracy, mkdir_p
 from explore_version_03.utils.logger import Logger, savefig
+from explore_version_03.models.proposedModels.loss import FocalLoss as focalloss
 import csv
+
 from explore_version_03.utils.measure import MeasureR
 
 # Models
@@ -210,8 +212,8 @@ def main():
     print('    Total params: %.2fM' % (sum(p.numel() for p in model.parameters())/1000000.0))
 
     # define loss function (criterion) and optimizer
-#    criterion = focalloss(label_distri = train_distri, model_name = args.arch)
-    criterion = nn.CrossEntropyLoss()
+    criterion = focalloss(gamma=10, label_distri=train_distri, model_name=args.arch, cuda_a=use_cuda)
+    # criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     
     print(args.test)
@@ -275,7 +277,7 @@ def main():
     for epoch in range(start_epoch, args.epochs):
         adjust_learning_rate(optimizer, epoch)
         print('\nEpoch: [%d | %d] LR: %f' % (epoch + 1, args.epochs, state['lr']))
-        train_loss, train_acc = train(train_loader, model, criterion, optimizer, epoch, use_cuda)
+        train_loss, train_acc = train(train_loader, model, criterion, optimizer, epoch, use_cuda, args.arch)
         test_loss, test_acc, _, _ = test(val_loader, model, criterion, epoch, use_cuda)
         l_loss, l_acc, _, _ = test(test_loader, model, criterion, epoch, use_cuda)
         
@@ -304,7 +306,7 @@ def main():
 
 
 
-def train(train_loader, model, criterion, optimizer, epoch, use_cuda):
+def train(train_loader, model, criterion, optimizer, epoch, use_cuda, arch):
     # switch to train mode
     model.train()
 
@@ -327,11 +329,17 @@ def train(train_loader, model, criterion, optimizer, epoch, use_cuda):
         inputs, targets = torch.autograd.Variable(inputs).float(), torch.autograd.Variable(targets)
 
         # compute output
-        outputs = model(inputs)
-        if use_cuda:
-          loss = criterion(outputs, targets.type(torch.LongTensor).cuda())
+        if arch == 'inception_v3':
+            outputs, aux_outputs = model(inputs)
+            loss1 = criterion(outputs, targets)
+            loss2 = criterion(aux_outputs, targets)
+            loss = loss1 + loss2
         else:
-          loss = criterion(outputs, targets.type(torch.LongTensor))
+            outputs = model(inputs)
+            if use_cuda:
+              loss = criterion(outputs, targets.type(torch.LongTensor).cuda())
+            else:
+              loss = criterion(outputs, targets.type(torch.LongTensor))
         
         # print ('train', loss)
         # measure accuracy and record loss

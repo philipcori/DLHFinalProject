@@ -27,7 +27,10 @@ class FocalLoss(nn.Module):
         log_p=torch.log(p + 1e-9)
         temp = torch.zeros(p.shape)
         if self.cuda_a:
-          temp = temp.cuda()
+            temp = temp.cuda()
+            log_p =  log_p.cuda()
+            self.label_distri = self.label_distri.cuda()
+
         target_v=temp.scatter_(1,torch.unsqueeze(target_d,dim=1),1.)
         
 #        loss = torch.abs(p - target_v)
