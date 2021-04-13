@@ -6,7 +6,7 @@ import csv
 
 case_list = []
 z0 = 0
-formal_covid_dict = pickle.load(open('./data_preprocess/formal_covid_dict_ap.pkl','rb'))
+formal_covid_dict = pickle.load(open('./data_preprocess/formal_covid_dict.pkl','rb'))
 for key, value in formal_covid_dict.items():
   for image_name, info in value['image_dict'].items():
     if 'PA' in info['type'] or 'AP' in info['type']:

@@ -8,7 +8,7 @@ positive_case_list = []
 negative_case_list_covid = []
 negative_case_list_xray = []
 
-formal_covid_dict = pickle.load(open('./data_preprocess/formal_covid_dict_ap.pkl','rb'))
+formal_covid_dict = pickle.load(open('./data_preprocess/formal_covid_dict.pkl','rb'))
 
 for key, value in formal_covid_dict.items():
   for image_name, info in value['image_dict'].items():

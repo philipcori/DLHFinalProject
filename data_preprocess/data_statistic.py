@@ -31,7 +31,7 @@ for key in kd.keys():
   print (key)
   p_set.add(key.split('_')[0])
 print (len(p_set))
-cd = pickle.load(open('./data_preprocess/formal_covid_dict_ap.pkl','rb'))
+cd = pickle.load(open('./data_preprocess/formal_covid_dict.pkl','rb'))
 for key in cd.keys():
   p_set.add(key.split('_')[0])  
 print (len(p_set))
