@@ -137,3 +137,6 @@ checkpoint/
 standard_data_augmentation_0405/
 standard_data_multiclass_0325/
 standard_data_multiclass_0922_crossentropy/
+standard_data_augmentation_nnn/
+standard_data_multiclass_nnn/
+nnn_data_multiclass_crossentropy/

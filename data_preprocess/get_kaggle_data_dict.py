@@ -11,7 +11,6 @@ data_dict = {}
 for dt in data_type:
   current_dir = os.path.join(data_dir, dt)
   normal_current_dir = os.path.join(current_dir, 'NORMAL')
-#  data_dict[dt] = {}
   for filename in os.listdir(normal_current_dir):
     ws = filename.split('.')[0].split('-')
     if ws[0] == 'IM':
