@@ -238,7 +238,7 @@ def main():
         runtype = []
         for func in loders:
           test_loss, test_acc, pred_d, real_d = test(func[0], model, criterion, start_epoch, use_cuda)
-          with open(os.path.join(results_dir, 'result_detail_%s_%s_cv1.csv'%(args.arch, func[1])), 'w') as f:
+          with open(os.path.join(results_dir, 'result_detail_%s_%s_cv1.csv'%(args.arch, func[1])), 'w', newline='') as f:
               csv_writer = csv.writer(f)
               for i in range(len(real_d)):
                   x = np.zeros(len(pred_d[i]))

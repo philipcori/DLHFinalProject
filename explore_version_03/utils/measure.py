@@ -9,8 +9,8 @@ from sklearn.metrics  import roc_curve,auc
 class MeasureR(object):
     def __init__(self, fdir, loss, acc):
       self.fdir = fdir
-      self.file_path = os.path.join(self.fdir, 'result_detail.csv')
-      self.wfile_path = os.path.join(self.fdir, 'measure_detail.csv')
+      self.file_path = os.path.join(self.fdir, 'result_detail_vgg19_bn_test_cv1.csv')
+      self.wfile_path = os.path.join(self.fdir, 'measure_detail_vgg19_bn_test_cv1.csv')
       
       self.acc = acc
       self.loss = loss
@@ -34,8 +34,10 @@ class MeasureR(object):
         predict_s = np.zeros(4).astype(float)
         tp_s = np.zeros(4)
         for row in csv_reader:
+          #print (row)
           pv = np.array(row[:4])
           rv = np.array(row[4:])
+          #print (pv, rv)
           p_id = np.argmax(pv)
           t_id = np.argmax(rv)
           target_s[t_id] += 1.
@@ -100,7 +102,7 @@ class MeasureR(object):
         plt.show()
 
 if __name__ == '__main__':
-    dir1 = './results/resnet18_v3_20200326_multiclass'
+    dir1 = './results/vgg19_bn_20200407_multiclass_cv5'
 #    dir2 = './results/resnet18_20200322_weight_1vs100_1_100_woRegularization'
 #    dir3 = './results/resnet18_20200322_weight_1vs6_15_100_woRegularization_augumentation'
 #    dir4 = './results/resnet18_20200322_weight_1vs6_15_100_woRegularization_stadndard'
