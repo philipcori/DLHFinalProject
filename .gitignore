@@ -140,3 +140,6 @@ standard_data_multiclass_0922_crossentropy/
 standard_data_augmentation_nnn/
 standard_data_multiclass_nnn/
 nnn_data_multiclass_crossentropy/
+results_backup/
+results_class_ensemble/
+results/
