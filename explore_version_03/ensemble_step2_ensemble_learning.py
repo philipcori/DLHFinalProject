@@ -241,7 +241,7 @@ def main():
         results_dir = os.path.join(args.results, experimentID)
         test_loss, test_acc, pred_d, real_d = test(test_loader, model, criterion, start_epoch, use_cuda)
         
-        with open(os.path.join(results_dir, 'result_detail.csv'), 'w') as f:
+        with open(os.path.join(results_dir, 'result_detail.csv'), 'w', newline='') as f:
             csv_writer = csv.writer(f)
             for i in range(len(real_d)):
                 x = np.zeros(len(pred_d[i]))
@@ -278,7 +278,7 @@ def main():
               }, epoch, is_best, checkpoint=checkpoint_dir)
 
     logger.close()
-    logger.plot()
+    #logger.plot()
     savefig(os.path.join(checkpoint_dir, 'log.eps'))
 
     print('Best acc:')

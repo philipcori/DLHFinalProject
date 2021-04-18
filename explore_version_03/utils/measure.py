@@ -9,8 +9,8 @@ from sklearn.metrics  import roc_curve,auc
 class MeasureR(object):
     def __init__(self, fdir, loss, acc):
       self.fdir = fdir
-      self.file_path = os.path.join(self.fdir, 'result_detail_vgg19_bn_test_cv1.csv')
-      self.wfile_path = os.path.join(self.fdir, 'measure_detail_vgg19_bn_test_cv1.csv')
+      self.file_path = os.path.join(self.fdir, 'result_detail.csv')
+      self.wfile_path = os.path.join(self.fdir, 'measure_detail.csv')
       
       self.acc = acc
       self.loss = loss
