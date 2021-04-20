@@ -23,8 +23,8 @@ for dt in data_type:
     image_path = os.path.join(normal_current_dir, filename)
     if data_dict.get(patient_id+'_'+subject_id) is None:
         data_dict[patient_id+'_'+subject_id] = {'class':{
-                                              'non_normal':0,
-                                              'normal':0
+                                              'normal':0,
+                                              'non_normal':0
                                               },
                                               'image_dict':{}}
     data_dict[patient_id+'_'+subject_id]['class']['normal'] = 1
@@ -41,8 +41,8 @@ for dt in data_type:
     image_path = os.path.join(abnormal_current_dir, filename)
     if data_dict.get(patient_id+'_'+subject_id) is None:
         data_dict[patient_id+'_'+subject_id] = {'class':{
-                                              'non_normal':0,
-                                              'normal':0
+                                              'normal':0,
+                                              'non_normal':0
                                               },
                                               'image_dict':{}}
     if  dtype in 'pneumonia_virus':
