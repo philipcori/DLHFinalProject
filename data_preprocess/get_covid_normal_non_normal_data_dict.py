@@ -111,7 +111,7 @@ for key, value in data_dict.items():
 pkl_file_name = 'normal_non_normal_covid_dict.pkl'
 pickle.dump(data_dict, open('./data_preprocess/' + pkl_file_name,'wb'))
 ##pickle.dump(pa_list, open('pa_list.pkl','wb'))
-saved_path = os.path.join(os.getcwd(), "data_preprocess", "formal_covid_dict.pkl")
+saved_path = os.path.join(os.getcwd(), "data_preprocess", "normal_non_normal_covid_dict.pkl")
 print(saved_path)
 # './data_preprocess/formal_covid_dict.pkl'
 if os.path.exists(saved_path):

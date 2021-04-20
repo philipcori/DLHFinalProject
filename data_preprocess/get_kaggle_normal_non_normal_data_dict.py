@@ -1,69 +1,62 @@
-import csv
 import os
 import pickle
 
-# data_root_dir = './original data/covid-chestxray-dataset'
-# image_root_dir = './original data/covid-chestxray-dataset/images'
-data_root_dir = os.path.join(os.getcwd(), 'original data', 'covid-chestxray-dataset')
-image_root_dir = os.path.join(os.getcwd(), 'original data', 'covid-chestxray-dataset', 'images')
+data_dir = os.path.join(os.getcwd(), 'original data', 'chest_xray')
 
-info_file_name = 'metadata.csv'
-
-info_path = os.path.join(data_root_dir, info_file_name)
-
+# './chest_xray'
+data_type = ['train','val','test']
+statistic_dict = {}
 data_dict = {}
 
-normal = ['No Finding']
-x0 = 0
-x1 = 0
-n_ct = 0
-n_ards = 0
-with open(info_path, 'r', encoding="UTF-8") as f:
-    csv_reader = csv.reader(f)
-    i = 0
-    for row in csv_reader:
-        if i == 0:
-            i += 1
-            continue
-        patient_id = row[0]
-        subject_id = row[1]
-        view = row[18]
-        image_name = row[23]
-        disease = row[4]
-        modality = row[19]
+for dt in data_type:
+  current_dir = os.path.join(data_dir, dt)
+  normal_current_dir = os.path.join(current_dir, 'NORMAL')
+  for filename in os.listdir(normal_current_dir):
+    ws = filename.split('.')[0].split('-')
+    if ws[0] == 'IM':
+      patient_id = 'IM'+ws[1]
+      subject_id = ws[2]
+    elif ws[1] == 'IM':
+      patient_id = 'IM'+ws[2]
+      subject_id = ws[3]
+    dtype = 'normal'
+    image_path = os.path.join(normal_current_dir, filename)
+    if data_dict.get(patient_id+'_'+subject_id) is None:
+        data_dict[patient_id+'_'+subject_id] = {'class':{
+                                              'non_normal':0,
+                                              'normal':0
+                                              },
+                                              'image_dict':{}}
+    data_dict[patient_id+'_'+subject_id]['class']['normal'] = 1
+    data_dict[patient_id+'_'+subject_id]['image_dict'][filename] = {
+        'path':image_path, 
+        'type':'AP'
+    }
+  abnormal_current_dir = os.path.join(current_dir, 'PNEUMONIA')
+  for filename in os.listdir(abnormal_current_dir):
+    ws = filename.split('.')[0].split('_')
+    patient_id = ws[0]
+    subject_id = ws[2]
+    dtype = ws[1]
+    image_path = os.path.join(abnormal_current_dir, filename)
+    if data_dict.get(patient_id+'_'+subject_id) is None:
+        data_dict[patient_id+'_'+subject_id] = {'class':{
+                                              'non_normal':0,
+                                              'normal':0
+                                              },
+                                              'image_dict':{}}
+    if  dtype in 'pneumonia_virus':
+      data_dict[patient_id+'_'+subject_id]['class']['non_normal'] = 1
+    if  dtype in 'pneumonia_bacteria':
+      data_dict[patient_id+'_'+subject_id]['class']['non_normal'] = 1
+    data_dict[patient_id+'_'+subject_id]['image_dict'][filename] = {
+        'path':image_path, 
+        'type':'AP'
+    }
 
-        print("patient id is: " + str(patient_id))
-        print("subject id is: " + str(subject_id))
-        print("view is: " + str(view))
-        print("image_name is: " + str(image_name))
-        print("disease is: " + str(disease))
-        print("modality is: " + str(modality))
-        print('--------------------------------------------------------')
-        if 'ray' not in modality:
-            n_ct += 1
-            continue
-        jpg_path = os.path.join(image_root_dir, image_name)
-        if os.path.exists(jpg_path) and 'AP' in view:
-            if data_dict.get(patient_id + '_' + subject_id) is None:
-                data_dict[patient_id + '_' + subject_id] = {'class': {
-                    'normal': 0,
-                    'non_normal': 0
-                },
-                'image_dict': {}}
-            if disease == 'ARDS':
-                n_ards += 1
-                continue
-            if disease in normal:
-                data_dict[patient_id + '_' + subject_id]['class']['normal'] = 1
-                x0 += 1
-            else:
-                data_dict[patient_id + '_' + subject_id]['class']['non_normal'] = 1
-                x1 += 1
-            data_dict[patient_id + '_' + subject_id]['image_dict'][image_name] = {
-                'path': jpg_path,
-                'type': view
-            }
+print ('finished')
 
+print (dt)
 y0 = 0
 y1 = 0
 y2 = 0
@@ -72,43 +65,34 @@ z0 = 0
 z1 = 0
 z2 = 0
 z3 = 0
-v0 = 0
-v1 = 0
-v2 = 0
-v3 = 0
-w0 = 0
-w1 = 0
-w2 = 0
-w3 = 0
 i = 0
 j = 0
-ap_list = []
-pa_list = []
 for key, value in data_dict.items():
-    for jpg_name, jpg_info in value['image_dict'].items():
-        y0 += value['class']['normal']
-        y1 += value['class']['non_normal']
-        j += 1
-        if 'PA' in jpg_info['type'] or 'AP' in jpg_info['type']:
-            i += 1
-            z0 += value['class']['normal']
-            z1 += value['class']['non_normal']
-            if 'PA' in jpg_info['type']:
-                pa_list.append(jpg_name)
-                v0 += value['class']['normal']
-                v1 += value['class']['non_normal']
-            if 'AP' in jpg_info['type']:
-                ap_list.append(jpg_name)
-                w0 += value['class']['normal']
-                w1 += value['class']['non_normal']
-
-pkl_file_name = 'normal_non_normal_kaggle_dict.pkl'
-pickle.dump(data_dict, open('./data_preprocess/' + pkl_file_name, 'wb'))
-##pickle.dump(pa_list, open('pa_list.pkl','wb'))
-saved_path = os.path.join(os.getcwd(), "data_preprocess", pkl_file_name)
-print(saved_path)
-# './data_preprocess/formal_covid_dict.pkl'
+  for jpg_name, jpg_info in value['image_dict'].items():
+    y0 += value['class']['normal']
+    y1 += value['class']['non_normal']
+    y2 += 0
+    y3 += 0
+    j += 1
+    if 'PA' in jpg_info['type'] or 'AP' in jpg_info['type']:
+      i += 1
+      z0 += value['class']['normal']
+      z1 += value['class']['non_normal']
+      z2 += 0
+      z3 += 0
+print (i, j)
+print (y0, y1, y2, y3)
+print (z0, z1, z2, z3)
+    
+saved_path = './data_preprocess/normal_non_normal_kaggle_dict.pkl'
 if os.path.exists(saved_path):
-    os.remove(saved_path)
-pickle.dump(data_dict, open(saved_path, 'wb'))
-print('finish')
+ os.remove(saved_path)
+pickle.dump(data_dict, open(saved_path,'wb'))
+print ('finish')
+
+print (i, j)
+# 5856 5856
+print (y0, y1, y2, y3)
+# 0 1493 2780 1583
+print (z0, z1, z2, z3)
+# 0 1493 2780 1583
