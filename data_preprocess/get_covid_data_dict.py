@@ -125,7 +125,7 @@ for key, value in data_dict.items():
         w1 += value['class']['pneumonia_virus']
         w2 += value['class']['pneumonia_bacteria']
         w3 += value['class']['normal']
-                 
+
 print (x0, x1, x2, x3)
 print (i, j)
 print (y0, y1, y2, y3)

@@ -60,7 +60,6 @@ for dt in data_type:
 
 print ('finished')
 
-print (dt)
 y0 = 0
 y1 = 0
 y2 = 0
