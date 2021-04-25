@@ -7,31 +7,26 @@ import time
 import random
 import numpy as np
 import torch
-import torch.nn as nn
 import torch.nn.parallel
 import torch.backends.cudnn as cudnn
 import torch.optim as optim
 import torch.utils.data as data
-import torchvision.transforms as transforms
-import torchvision.datasets as datasets
 import torchvision.models as models
 from explore_version_03.models import imagenet as customized_models
-from explore_version_03.data.xray_dataset_0328_nnn import XrayDataset
+from explore_version_03.data.xray_dataset_0328_3classes import XrayDataset
 from explore_version_03.utils import Bar, AverageMeter, accuracy, mkdir_p
 from explore_version_03.utils.logger import Logger, savefig
 from explore_version_03.models.proposedModels.loss import FocalLoss as focalloss
 import csv
 
-from explore_version_03.utils.measure import MeasureR
-
 # Models
 default_model_names = sorted(name for name in models.__dict__
-    if name.islower() and not name.startswith("__")
-    and callable(models.__dict__[name]))
+                             if name.islower() and not name.startswith("__")
+                             and callable(models.__dict__[name]))
 
 customized_models_names = sorted(name for name in customized_models.__dict__
-    if name.islower() and not name.startswith("__")
-    and callable(customized_models.__dict__[name]))
+                                 if name.islower() and not name.startswith("__")
+                                 and callable(customized_models.__dict__[name]))
 
 for name in customized_models.__dict__:
     if name.islower() and not name.startswith("__") and callable(customized_models.__dict__[name]):
@@ -48,7 +43,7 @@ parser.add_argument('--experimentID', default='%s_20200407_multiclass_cv5', type
 
 # Datasets
 parser.add_argument('-d', '--data', default=
-                    './data_preprocess/nnn_data_multiclass_crossentropy/exp_%s_list_cv5.pkl', type=str)
+'./data_preprocess/3classes_data_multiclass_crossentropy/exp_%s_list_cv5.pkl', type=str)
 parser.add_argument('--label_file', default='./exp_data/metadata.csv', type=str)
 parser.add_argument('-j', '--workers', default=1, type=int, metavar='N',
                     help='number of data loading workers (default: 4)')
@@ -75,7 +70,7 @@ parser.add_argument('--lr', '--learning-rate', default=0.001, type=float,
 parser.add_argument('--drop', '--dropout', default=0.5, type=float,
                     metavar='Dropout', help='Dropout ratio')
 parser.add_argument('--schedule', type=int, nargs='+', default=[150, 225],
-                        help='Decrease learning rate at these epochs.')
+                    help='Decrease learning rate at these epochs.')
 parser.add_argument('--gamma', type=float, default=0.1, help='LR is multiplied by gamma on schedule.')
 parser.add_argument('--momentum', default=0.9, type=float, metavar='M',
                     help='momentum')
@@ -89,7 +84,7 @@ parser.add_argument('-ck_n', '--checkpoint_saved_n', default=2, type=int, metava
                     help='each N epoch to save model')
 
 # Test Outputs
-parser.add_argument('--test', default = False, dest='test', action='store_true',
+parser.add_argument('--test', default=False, dest='test', action='store_true',
                     help='evaluate model on test set')
 parser.add_argument('--results', default='./explore_version_03/results', type=str, metavar='PATH',
                     help='path to save experiment results (default: results)')
@@ -100,8 +95,8 @@ parser.add_argument('-r', '--resume', default='', type=str, metavar='PATH',
 parser.add_argument('--arch', '-a', metavar='ARCH', default='vgg19_bn',
                     choices=model_names,
                     help='model architecture: ' +
-                        ' | '.join(model_names) +
-                        ' (default: resnet18)')
+                         ' | '.join(model_names) +
+                         ' (default: resnet18)')
 parser.add_argument('--depth', type=int, default=29, help='Model depth.')
 parser.add_argument('--cardinality', type=int, default=32, help='ResNet cardinality (group).')
 parser.add_argument('--base-width', type=int, default=2, help='ResNet base width.')
@@ -111,7 +106,7 @@ parser.add_argument('--widen-factor', type=int, default=4, help='Widen factor. 4
 parser.add_argument('--manualSeed', type=int, help='manual seed')
 parser.add_argument('--pretrained', dest='pretrained', default=True, action='store_false',
                     help='use pre-trained model')
-#Device options
+# Device options
 parser.add_argument('--gpu-id', default='0', type=str,
                     help='id(s) for CUDA_VISIBLE_DEVICES')
 
@@ -121,6 +116,8 @@ state = {k: v for k, v in args._get_kwargs()}
 # Use CUDA
 os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu_id
 use_cuda = torch.cuda.is_available()
+
+use_cuda = False
 
 # Random seed
 if args.manualSeed is None:
@@ -132,19 +129,20 @@ if use_cuda:
 
 best_acc = 0  # best test accuracy
 
+
 def main():
     global best_acc
     start_epoch = args.start_epoch  # start from epoch 0 or last checkpoint epoch
-    
-    experimentID = args.experimentID%args.arch
+
+    experimentID = args.experimentID % args.arch
     if not os.path.isdir(args.checkpoint):
         mkdir_p(args.checkpoint)
-    
+
     if not os.path.isdir(os.path.join(args.checkpoint, experimentID)):
         mkdir_p(os.path.join(args.checkpoint, experimentID))
-    
+
     checkpoint_dir = os.path.join(args.checkpoint, experimentID)
-    
+
     # Data loading code
     train_dataset = XrayDataset(args, 'train')
     train_distri = train_dataset.get_label_distri()
@@ -160,47 +158,47 @@ def main():
                                              pin_memory=True)
     test_dataset = XrayDataset(args, 'test')
     test_loader = torch.utils.data.DataLoader(test_dataset,
-                                             batch_size=args.test_batch,
-                                             shuffle=False,
-                                             num_workers=args.workers,
-                                             pin_memory=True)
-#    loders = [(test_loader, 'test')]
-    loders = [(train_loader, 'train'), (val_loader, 'valid'), (test_loader, 'test')]
+                                              batch_size=args.test_batch,
+                                              shuffle=False,
+                                              num_workers=args.workers,
+                                              pin_memory=True)
+    #    loders = [(test_loader, 'test')]
+    loaders = [(train_loader, 'train'), (val_loader, 'valid'), (test_loader, 'test')]
     # create model
     if args.pretrained:
         print("=> using pre-trained model '{}'".format(args.arch))
         model = models.__dict__[args.arch](pretrained=True)
     elif args.arch.startswith('resnext'):
         model = models.__dict__[args.arch](
-                    baseWidth=args.base_width,
-                    cardinality=args.cardinality,
-                )
+            baseWidth=args.base_width,
+            cardinality=args.cardinality,
+        )
     else:
         print("=> creating model '{}'".format(args.arch))
         model = models.__dict__[args.arch]()
-#    for key, value in model.state_dict().items():
-#      print (key, value.shape)
+    #    for key, value in model.state_dict().items():
+    #      print (key, value.shape)
     if args.arch == 'vgg19_bn':
-        model.classifier[6] = torch.nn.Linear(4096, 2, bias=True)
+        model.classifier[6] = torch.nn.Linear(4096, 3, bias=True)
     elif args.arch == "inception_v3":
-        model.fc = torch.nn.Linear(2048, 2, bias=True)
+        model.fc = torch.nn.Linear(2048, 3, bias=True)
     elif args.arch == "resnext101_32x8d":
-        model.fc = torch.nn.Linear(2048, 2, bias=True)
+        model.fc = torch.nn.Linear(2048, 3, bias=True)
     elif args.arch == "alexnet":
-        model.classifier[6] = torch.nn.Linear(model.classifier[6].in_features, 2, bias=True)
+        model.classifier[6] = torch.nn.Linear(model.classifier[6].in_features, 3, bias=True)
     elif args.arch == 'resnet18':
-        model.fc = torch.nn.Linear(512, 2, bias=True)
+        model.fc = torch.nn.Linear(512, 3, bias=True)
     elif args.arch == 'resnet50':
-        model.fc = torch.nn.Linear(2048, 2, bias=True)
+        model.fc = torch.nn.Linear(2048, 3, bias=True)
     elif args.arch == 'resnet101':
-        model.fc = torch.nn.Linear(2048, 2, bias=True)
+        model.fc = torch.nn.Linear(2048, 3, bias=True)
     elif args.arch == 'resnet152':
-        model.fc = torch.nn.Linear(2048, 2, bias=True)
+        model.fc = torch.nn.Linear(2048, 3, bias=True)
     elif args.arch == 'densenet121':
-        model.classifier = torch.nn.Linear(1024, 2, bias=True)
+        model.classifier = torch.nn.Linear(1024, 3, bias=True)
     elif args.arch == 'densenet161':
-        model.classifier = torch.nn.Linear(2208, 2, bias=True)
-        
+        model.classifier = torch.nn.Linear(2208, 3, bias=True)
+
     if use_cuda:
         if args.arch.startswith('alexnet') or args.arch.startswith('vgg'):
             model.features = torch.nn.DataParallel(model.features)
@@ -209,70 +207,70 @@ def main():
             model = torch.nn.DataParallel(model).cuda()
 
     cudnn.benchmark = True
-    print('    Total params: %.2fM' % (sum(p.numel() for p in model.parameters())/1000000.0))
+    print('    Total params: %.2fM' % (sum(p.numel() for p in model.parameters()) / 1000000.0))
 
     # define loss function (criterion) and optimizer
     criterion = focalloss(gamma=10, label_distri=train_distri, model_name=args.arch, cuda_a=use_cuda)
     # criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
-    
+
     print(args.test)
     if args.test is False:
-      # Resume
-      title = args.arch
-      if args.resume:
-          # Load checkpoint.
-          print('==> Resuming from checkpoint..')
-          checkpoint_path = os.path.join(checkpoint_dir,args.resume+'.checkpoint.pth.tar')
-          print (checkpoint_path)
-          assert os.path.isfile(checkpoint_path), 'Error: no checkpoint directory found!'
-          checkpoint = torch.load(checkpoint_path)
-          best_acc = checkpoint['best_acc']
-          start_epoch = checkpoint['epoch']
-          model.load_state_dict(checkpoint['state_dict'])
-          optimizer.load_state_dict(checkpoint['optimizer'])
-          logger = Logger(os.path.join(checkpoint_dir, 'log.txt'), title=title, resume=True)
-      else:
-          logger = Logger(os.path.join(checkpoint_dir, 'log.txt'), title=title)
-          logger.set_names(['Learning Rate', 'Train Loss', 'Valid Loss', 'Train Acc.', 'Valid Acc.'])
-
-
-    if args.test:
-        print('\Test only')
-        if len(args.resume) > 0:
-          print ('load %s-th checkpoint'%args.resume)
-          checkpoint_path = os.path.join(checkpoint_dir,args.resume+'.checkpoint.pth.tar')
+        # Resume
+        title = args.arch
+        if args.resume:
+            # Load checkpoint.
+            print('==> Resuming from checkpoint..')
+            checkpoint_path = os.path.join(checkpoint_dir, args.resume + '.checkpoint.pth.tar')
+            print(checkpoint_path)
+            assert os.path.isfile(checkpoint_path), 'Error: no checkpoint directory found!'
+            checkpoint = torch.load(checkpoint_path)
+            best_acc = checkpoint['best_acc']
+            start_epoch = checkpoint['epoch']
+            model.load_state_dict(checkpoint['state_dict'])
+            optimizer.load_state_dict(checkpoint['optimizer'])
+            logger = Logger(os.path.join(checkpoint_dir, 'log.txt'), title=title, resume=True)
         else:
-          print ('load best checkpoint')
-          checkpoint_path = os.path.join(checkpoint_dir,'model_best.pth.tar')
-        print (checkpoint_path)
-        assert os.path.isfile(checkpoint_path), 'Error: no checkpoint directory found!'
-        checkpoint = torch.load(checkpoint_path)
-        best_acc = checkpoint['best_acc']
-        start_epoch = checkpoint['epoch']
-        model.load_state_dict(checkpoint['state_dict'])
-        optimizer.load_state_dict(checkpoint['optimizer'])
-          
-        if not os.path.isdir(args.results):
-            mkdir_p(args.results)
-        if not os.path.isdir(os.path.join(args.results, experimentID)):
-            mkdir_p(os.path.join(args.results, experimentID))
-        results_dir = os.path.join(args.results, experimentID)
-        runtype = []
-        for func in loders:
-          test_loss, test_acc, pred_d, real_d = test(func[0], model, criterion, start_epoch, use_cuda)
-          with open(os.path.join(results_dir, 'result_detail_%s_%s_cv1.csv'%(args.arch, func[1])), 'w') as f:
-              csv_writer = csv.writer(f)
-              for i in range(len(real_d)):
-                  x = np.zeros(len(pred_d[i]))
-                  x[real_d[i]] = 1
-#                  y = np.exp(pred_d[i])/np.sum(np.exp(pred_d[i]))
-                  csv_writer.writerow(list(np.array(pred_d[i])) + list(x))
-        
-#        mr = MeasureR(results_dir, test_loss, test_acc)
-#        mr.output()
-          print(' Test Loss:  %.8f, Test Acc:  %.4f' % (test_loss, test_acc))
-        return
+            logger = Logger(os.path.join(checkpoint_dir, 'log.txt'), title=title)
+            logger.set_names(['Learning Rate', 'Train Loss', 'Valid Loss', 'Train Acc.', 'Valid Acc.'])
+
+        if args.test:
+            print('\Test only')
+            if len(args.resume) > 0:
+                print('load %s-th checkpoint' % args.resume)
+                checkpoint_path = os.path.join(checkpoint_dir, args.resume + '.checkpoint.pth.tar')
+            else:
+                print('load best checkpoint')
+                checkpoint_path = os.path.join(checkpoint_dir, 'model_best.pth.tar')
+            print(checkpoint_path)
+            assert os.path.isfile(checkpoint_path), 'Error: no checkpoint directory found!'
+            checkpoint = torch.load(checkpoint_path)
+            best_acc = checkpoint['best_acc']
+            start_epoch = checkpoint['epoch']
+            model.load_state_dict(checkpoint['state_dict'])
+            optimizer.load_state_dict(checkpoint['optimizer'])
+
+            if not os.path.isdir(args.results):
+                mkdir_p(args.results)
+            if not os.path.isdir(os.path.join(args.results, experimentID)):
+                mkdir_p(os.path.join(args.results, experimentID))
+            results_dir = os.path.join(args.results, experimentID)
+            runtype = []
+            for func in loaders:
+                test_loss, test_acc, pred_d, real_d = test(func[0], model, criterion, start_epoch, use_cuda)
+                with open(os.path.join(results_dir, 'result_detail_%s_%s_cv1.csv' % (args.arch, func[1])), 'w',
+                          newline='') as f:
+                    csv_writer = csv.writer(f)
+                    for i in range(len(real_d)):
+                        x = np.zeros(len(pred_d[i]))
+                        x[real_d[i]] = 1
+                        #                  y = np.exp(pred_d[i])/np.sum(np.exp(pred_d[i]))
+                        csv_writer.writerow(list(np.array(pred_d[i])) + list(x))
+
+                #        mr = MeasureR(results_dir, test_loss, test_acc)
+                #        mr.output()
+                print(' Test Loss:  %.8f, Test Acc:  %.4f' % (test_loss, test_acc))
+            return
 
     for epoch in range(start_epoch, args.epochs):
         adjust_learning_rate(optimizer, epoch)
@@ -280,30 +278,29 @@ def main():
         train_loss, train_acc = train(train_loader, model, criterion, optimizer, epoch, use_cuda, args.arch)
         test_loss, test_acc, _, _ = test(val_loader, model, criterion, epoch, use_cuda)
         l_loss, l_acc, _, _ = test(test_loader, model, criterion, epoch, use_cuda)
-        
-        print (train_loss, train_acc, test_acc, l_acc)
+
+        print(train_loss, train_acc, test_acc, l_acc)
         # append logger file
         logger.append([state['lr'], train_loss, test_loss, train_acc, test_acc])
 
         # save model
         is_best = test_acc > best_acc
         best_acc = max(test_acc, best_acc)
-        if epoch%args.checkpoint_saved_n == 0:
-          save_checkpoint({
-                  'epoch': epoch,
-                  'state_dict': model.state_dict(),
-                  'acc': test_acc,
-                  'best_acc': best_acc,
-                  'optimizer' : optimizer.state_dict(),
-              }, epoch, is_best, checkpoint=checkpoint_dir)
+        if epoch % args.checkpoint_saved_n == 0:
+            save_checkpoint({
+                'epoch': epoch,
+                'state_dict': model.state_dict(),
+                'acc': test_acc,
+                'best_acc': best_acc,
+                'optimizer': optimizer.state_dict(),
+            }, epoch, is_best, checkpoint=checkpoint_dir)
 
     logger.close()
-    #logger.plot()
+    # logger.plot()
     savefig(os.path.join(checkpoint_dir, 'log.eps'))
 
     print('Best acc:')
     print(best_acc)
-
 
 
 def train(train_loader, model, criterion, optimizer, epoch, use_cuda, arch):
@@ -337,10 +334,10 @@ def train(train_loader, model, criterion, optimizer, epoch, use_cuda, arch):
         else:
             outputs = model(inputs)
             if use_cuda:
-              loss = criterion(outputs, targets.type(torch.LongTensor).cuda())
+                loss = criterion(outputs, targets.type(torch.LongTensor).cuda())
             else:
-              loss = criterion(outputs, targets.type(torch.LongTensor))
-        
+                loss = criterion(outputs, targets.type(torch.LongTensor))
+
         # print ('train', loss)
         # measure accuracy and record loss
         prec1, prec5 = accuracy(outputs.data, targets.data, topk=(1, 1))
@@ -358,20 +355,21 @@ def train(train_loader, model, criterion, optimizer, epoch, use_cuda, arch):
         end = time.time()
 
         # plot progress
-        bar.suffix  = '({batch}/{size}) Data: {data:.3f}s | Batch: {bt:.3f}s | Total: {total:} | ETA: {eta:} | Loss: {loss:.4f} | top1: {top1: .4f} | top5: {top5: .4f}'.format(
-                    batch=batch_idx + 1,
-                    size=len(train_loader),
-                    data=data_time.val,
-                    bt=batch_time.val,
-                    total=bar.elapsed_td,
-                    eta=bar.eta_td,
-                    loss=losses.avg,
-                    top1=top1.avg,
-                    top5=top5.avg,
-                    )
+        bar.suffix = '({batch}/{size}) Data: {data:.3f}s | Batch: {bt:.3f}s | Total: {total:} | ETA: {eta:} | Loss: {loss:.4f} | top1: {top1: .4f} | top5: {top5: .4f}'.format(
+            batch=batch_idx + 1,
+            size=len(train_loader),
+            data=data_time.val,
+            bt=batch_time.val,
+            total=bar.elapsed_td,
+            eta=bar.eta_td,
+            loss=losses.avg,
+            top1=top1.avg,
+            top5=top5.avg,
+        )
         bar.next()
     bar.finish()
     return (losses.avg, top1.avg)
+
 
 def test(val_loader, model, criterion, epoch, use_cuda):
     global best_acc
@@ -428,11 +426,13 @@ def test(val_loader, model, criterion, epoch, use_cuda):
     bar.finish()
     return (losses.avg, top1.avg, np.concatenate(pred_labels, 0), np.array(real_labels))
 
+
 def save_checkpoint(state, epoch_id, is_best, checkpoint='checkpoint', filename='checkpoint.pth.tar'):
-    filepath = os.path.join(checkpoint, str(epoch_id)+'.'+filename)
+    filepath = os.path.join(checkpoint, str(epoch_id) + '.' + filename)
     torch.save(state, filepath)
     if is_best:
         shutil.copyfile(filepath, os.path.join(checkpoint, 'model_best.pth.tar'))
+
 
 def adjust_learning_rate(optimizer, epoch):
     global state
@@ -440,6 +440,7 @@ def adjust_learning_rate(optimizer, epoch):
         state['lr'] *= args.gamma
         for param_group in optimizer.param_groups:
             param_group['lr'] = state['lr']
+
 
 if __name__ == '__main__':
     main()
