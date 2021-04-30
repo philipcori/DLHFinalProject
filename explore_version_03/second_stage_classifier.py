@@ -117,7 +117,7 @@ state = {k: v for k, v in args._get_kwargs()}
 os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu_id
 use_cuda = torch.cuda.is_available()
 
-use_cuda = False
+#use_cuda = False
 
 # Random seed
 if args.manualSeed is None:
