@@ -10,8 +10,8 @@ from sklearn.metrics import roc_curve, auc
 class MeasureR(object):
     def __init__(self, fdir, loss, acc):
         self.fdir = fdir
-        self.file_path = os.path.join(self.fdir, 'result_detail.csv')
-        self.wfile_path = os.path.join(self.fdir, 'measure_detail.csv')
+        self.file_path = os.path.join(self.fdir, 'result_detail_vgg19_bn_train_cv1.csv')
+        self.wfile_path = os.path.join(self.fdir, 'measure_detail_vgg19_bn_train_cv1.csv')
 
         self.acc = acc
         self.loss = loss
@@ -29,13 +29,13 @@ class MeasureR(object):
             l1 = []
             l2 = []
 
-            target_s = np.zeros(4).astype(float)
-            predict_s = np.zeros(4).astype(float)
-            tp_s = np.zeros(4)
+            target_s = np.zeros(3).astype(float)
+            predict_s = np.zeros(3).astype(float)
+            tp_s = np.zeros(3)
             for row in csv_reader:
                 # print (row)
-                pv = np.array(row[:4])
-                rv = np.array(row[4:])
+                pv = np.array(row[:3])
+                rv = np.array(row[3:])
                 # print (pv, rv)
                 p_id = np.argmax(pv)
                 t_id = np.argmax(rv)
@@ -46,9 +46,9 @@ class MeasureR(object):
                 p0.append(float(row[0]))
                 p1.append(float(row[1]))
                 p2.append(float(row[2]))
-                l0.append(int(float(row[4])))
-                l1.append(int(float(row[5])))
-                l2.append(int(float(row[6])))
+                l0.append(int(float(row[3])))
+                l1.append(int(float(row[4])))
+                l2.append(int(float(row[5])))
             p0 = np.array(p0)
             p1 = np.array(p1)
             p2 = np.array(p2)
@@ -94,7 +94,7 @@ class MeasureR(object):
 
 
 if __name__ == '__main__':
-    dir1 = './explore_version_03/results/alexnet_20200407_multiclass_cv5'
+    dir1 = './explore_version_03/results/vgg19_bn_20200407_multiclass_cv5'
     #    dir2 = './results/resnet18_20200322_weight_1vs100_1_100_woRegularization'
     #    dir3 = './results/resnet18_20200322_weight_1vs6_15_100_woRegularization_augumentation'
     #    dir4 = './results/resnet18_20200322_weight_1vs6_15_100_woRegularization_stadndard'
