@@ -10,8 +10,8 @@ from sklearn.metrics import roc_curve, auc
 class MeasureR(object):
     def __init__(self, fdir, loss, acc):
         self.fdir = fdir
-        self.file_path = os.path.join(self.fdir, 'result_detail_vgg19_bn_train_cv1.csv')
-        self.wfile_path = os.path.join(self.fdir, 'measure_detail_vgg19_bn_train_cv1.csv')
+        self.file_path = os.path.join(self.fdir, 'result_detail.csv')
+        self.wfile_path = os.path.join(self.fdir, 'measure_detail.csv')
 
         self.acc = acc
         self.loss = loss
@@ -94,7 +94,7 @@ class MeasureR(object):
 
 
 if __name__ == '__main__':
-    dir1 = './explore_version_03/results/vgg19_bn_20200407_multiclass_cv5'
+    dir1 = './explore_version_03/results/flannel_20200719_gamma_10_multiclass_cv5_focal'
     #    dir2 = './results/resnet18_20200322_weight_1vs100_1_100_woRegularization'
     #    dir3 = './results/resnet18_20200322_weight_1vs6_15_100_woRegularization_augumentation'
     #    dir4 = './results/resnet18_20200322_weight_1vs6_15_100_woRegularization_stadndard'

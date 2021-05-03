@@ -21,7 +21,7 @@ from explore_version_03.data.ensemble_dataset_3classes import EnsembleDatasetSam
 from explore_version_03.utils import Bar, AverageMeter, accuracy, mkdir_p
 from explore_version_03.utils.logger import Logger, savefig
 import csv
-from explore_version_03.utils.measure import MeasureR
+from explore_version_03.utils.measure_second_stage import MeasureR
 from explore_version_03.models.proposedModels.loss import FocalLoss as focalloss
 # cv3: 0.001
 
