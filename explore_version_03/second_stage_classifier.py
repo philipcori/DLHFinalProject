@@ -215,7 +215,7 @@ def main():
     optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 
     print(args.test)
-    if args.test is False:
+    if args.test:
         # Resume
         title = args.arch
         if args.resume:
