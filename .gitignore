@@ -134,6 +134,8 @@ covid-chestxray-dataset/
 *.pkl
 .DS_Store
 checkpoint/
+checkpoint_first_stage/
+checkpoint_second_stage/
 standard_data_augmentation_0405/
 standard_data_multiclass_0325/
 standard_data_multiclass_0922_crossentropy/
