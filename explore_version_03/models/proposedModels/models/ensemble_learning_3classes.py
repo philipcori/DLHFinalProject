@@ -79,7 +79,6 @@ class FlannelNet(nn.Module):
         x2 = x1.permute(0,2,1)
         x3 = torch.matmul(x1,x2)
         x3 = x3.view(L, -1)
-        print(self.ew1(x3))
         wv = self.sm(self.ew1(x3)).unsqueeze(-1)
         v = torch.sum(wv * z, 1)
         return v
