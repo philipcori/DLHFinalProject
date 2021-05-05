@@ -210,7 +210,7 @@ def main():
     print('    Total params: %.2fM' % (sum(p.numel() for p in model.parameters()) / 1000000.0))
 
     # define loss function (criterion) and optimizer
-    criterion = focalloss(gamma=10, label_distri=train_distri, model_name=args.arch, cuda_a=use_cuda)
+    criterion = focalloss(gamma=3, label_distri=train_distri, model_name=args.arch, cuda_a=use_cuda)
     # criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 
