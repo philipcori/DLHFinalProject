@@ -215,62 +215,62 @@ def main():
     optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 
     print(args.test)
+    
+    # Resume
+    title = args.arch
+    if args.resume:
+        # Load checkpoint.
+        print('==> Resuming from checkpoint..')
+        checkpoint_path = os.path.join(checkpoint_dir, args.resume + '.checkpoint.pth.tar')
+        print(checkpoint_path)
+        assert os.path.isfile(checkpoint_path), 'Error: no checkpoint directory found!'
+        checkpoint = torch.load(checkpoint_path)
+        best_acc = checkpoint['best_acc']
+        start_epoch = checkpoint['epoch']
+        model.load_state_dict(checkpoint['state_dict'])
+        optimizer.load_state_dict(checkpoint['optimizer'])
+        logger = Logger(os.path.join(checkpoint_dir, 'log.txt'), title=title, resume=True)
+    else:
+        logger = Logger(os.path.join(checkpoint_dir, 'log.txt'), title=title)
+        logger.set_names(['Learning Rate', 'Train Loss', 'Valid Loss', 'Train Acc.', 'Valid Acc.'])
+
     if args.test:
-        # Resume
-        title = args.arch
-        if args.resume:
-            # Load checkpoint.
-            print('==> Resuming from checkpoint..')
+        print('\Test only')
+        if len(args.resume) > 0:
+            print('load %s-th checkpoint' % args.resume)
             checkpoint_path = os.path.join(checkpoint_dir, args.resume + '.checkpoint.pth.tar')
-            print(checkpoint_path)
-            assert os.path.isfile(checkpoint_path), 'Error: no checkpoint directory found!'
-            checkpoint = torch.load(checkpoint_path)
-            best_acc = checkpoint['best_acc']
-            start_epoch = checkpoint['epoch']
-            model.load_state_dict(checkpoint['state_dict'])
-            optimizer.load_state_dict(checkpoint['optimizer'])
-            logger = Logger(os.path.join(checkpoint_dir, 'log.txt'), title=title, resume=True)
         else:
-            logger = Logger(os.path.join(checkpoint_dir, 'log.txt'), title=title)
-            logger.set_names(['Learning Rate', 'Train Loss', 'Valid Loss', 'Train Acc.', 'Valid Acc.'])
+            print('load best checkpoint')
+            checkpoint_path = os.path.join(checkpoint_dir, 'model_best.pth.tar')
+        print(checkpoint_path)
+        assert os.path.isfile(checkpoint_path), 'Error: no checkpoint directory found!'
+        checkpoint = torch.load(checkpoint_path)
+        best_acc = checkpoint['best_acc']
+        start_epoch = checkpoint['epoch']
+        model.load_state_dict(checkpoint['state_dict'])
+        optimizer.load_state_dict(checkpoint['optimizer'])
 
-        if args.test:
-            print('\Test only')
-            if len(args.resume) > 0:
-                print('load %s-th checkpoint' % args.resume)
-                checkpoint_path = os.path.join(checkpoint_dir, args.resume + '.checkpoint.pth.tar')
-            else:
-                print('load best checkpoint')
-                checkpoint_path = os.path.join(checkpoint_dir, 'model_best.pth.tar')
-            print(checkpoint_path)
-            assert os.path.isfile(checkpoint_path), 'Error: no checkpoint directory found!'
-            checkpoint = torch.load(checkpoint_path)
-            best_acc = checkpoint['best_acc']
-            start_epoch = checkpoint['epoch']
-            model.load_state_dict(checkpoint['state_dict'])
-            optimizer.load_state_dict(checkpoint['optimizer'])
+        if not os.path.isdir(args.results):
+            mkdir_p(args.results)
+        if not os.path.isdir(os.path.join(args.results, experimentID)):
+            mkdir_p(os.path.join(args.results, experimentID))
+        results_dir = os.path.join(args.results, experimentID)
+        runtype = []
+        for func in loaders:
+            test_loss, test_acc, pred_d, real_d = test(func[0], model, criterion, start_epoch, use_cuda)
+            with open(os.path.join(results_dir, 'result_detail_%s_%s_cv1.csv' % (args.arch, func[1])), 'w',
+                        newline='') as f:
+                csv_writer = csv.writer(f)
+                for i in range(len(real_d)):
+                    x = np.zeros(len(pred_d[i]))
+                    x[real_d[i]] = 1
+                    #                  y = np.exp(pred_d[i])/np.sum(np.exp(pred_d[i]))
+                    csv_writer.writerow(list(np.array(pred_d[i])) + list(x))
 
-            if not os.path.isdir(args.results):
-                mkdir_p(args.results)
-            if not os.path.isdir(os.path.join(args.results, experimentID)):
-                mkdir_p(os.path.join(args.results, experimentID))
-            results_dir = os.path.join(args.results, experimentID)
-            runtype = []
-            for func in loaders:
-                test_loss, test_acc, pred_d, real_d = test(func[0], model, criterion, start_epoch, use_cuda)
-                with open(os.path.join(results_dir, 'result_detail_%s_%s_cv1.csv' % (args.arch, func[1])), 'w',
-                          newline='') as f:
-                    csv_writer = csv.writer(f)
-                    for i in range(len(real_d)):
-                        x = np.zeros(len(pred_d[i]))
-                        x[real_d[i]] = 1
-                        #                  y = np.exp(pred_d[i])/np.sum(np.exp(pred_d[i]))
-                        csv_writer.writerow(list(np.array(pred_d[i])) + list(x))
-
-                #        mr = MeasureR(results_dir, test_loss, test_acc)
-                #        mr.output()
-                print(' Test Loss:  %.8f, Test Acc:  %.4f' % (test_loss, test_acc))
-            return
+            #        mr = MeasureR(results_dir, test_loss, test_acc)
+            #        mr.output()
+            print(' Test Loss:  %.8f, Test Acc:  %.4f' % (test_loss, test_acc))
+        return
 
     for epoch in range(start_epoch, args.epochs):
         adjust_learning_rate(optimizer, epoch)
