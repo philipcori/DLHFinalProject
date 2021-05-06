@@ -182,25 +182,25 @@ def main():
     #    for key, value in model.state_dict().items():
     #      print (key, value.shape)
     if args.arch == 'vgg19_bn':
-        model.classifier[6] = torch.nn.Linear(4096, 3, bias=True)
+        model.classifier[6] = torch.nn.Linear(4096, 2, bias=True)
     elif args.arch == "inception_v3":
-        model.fc = torch.nn.Linear(2048, 3, bias=True)
+        model.fc = torch.nn.Linear(2048, 2, bias=True)
     elif args.arch == "resnext101_32x8d":
-        model.fc = torch.nn.Linear(2048, 3, bias=True)
+        model.fc = torch.nn.Linear(2048, 2, bias=True)
     elif args.arch == "alexnet":
-        model.classifier[6] = torch.nn.Linear(model.classifier[6].in_features, 3, bias=True)
+        model.classifier[6] = torch.nn.Linear(model.classifier[6].in_features, 2, bias=True)
     elif args.arch == 'resnet18':
-        model.fc = torch.nn.Linear(512, 3, bias=True)
+        model.fc = torch.nn.Linear(512, 2, bias=True)
     elif args.arch == 'resnet50':
-        model.fc = torch.nn.Linear(2048, 3, bias=True)
+        model.fc = torch.nn.Linear(2048, 2, bias=True)
     elif args.arch == 'resnet101':
-        model.fc = torch.nn.Linear(2048, 3, bias=True)
+        model.fc = torch.nn.Linear(2048, 2, bias=True)
     elif args.arch == 'resnet152':
-        model.fc = torch.nn.Linear(2048, 3, bias=True)
+        model.fc = torch.nn.Linear(2048, 2, bias=True)
     elif args.arch == 'densenet121':
-        model.classifier = torch.nn.Linear(1024, 3, bias=True)
+        model.classifier = torch.nn.Linear(1024, 2, bias=True)
     elif args.arch == 'densenet161':
-        model.classifier = torch.nn.Linear(2208, 3, bias=True)
+        model.classifier = torch.nn.Linear(2208, 2, bias=True)
 
     if use_cuda:
         if args.arch.startswith('alexnet') or args.arch.startswith('vgg'):
