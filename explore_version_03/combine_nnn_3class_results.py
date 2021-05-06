@@ -33,7 +33,7 @@ def main():
             elif max(row_3classes[:3]) == row_3classes[1]:
                 results.append([0.0,1.0,0.0,0.0] + real_labels)
             else:
-                results.append([0.0,0.0,0.0,1.0] + real_labels)
+                results.append([0.0,0.0,1.0,0.0] + real_labels)
 
     with open(dest_results_dir_path, 'w', newline='') as out_file:
         writer = csv.writer(out_file)
