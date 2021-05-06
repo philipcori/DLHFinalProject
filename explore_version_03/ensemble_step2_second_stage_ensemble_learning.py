@@ -195,6 +195,8 @@ def main():
 
     if use_cuda:
         model = torch.nn.DataParallel(model).cuda()
+    else:
+        model = torch.nn.DataParallel(model)
 
     cudnn.benchmark = True
     print('    Total params: %.2fM' % (sum(p.numel() for p in model.parameters())/1000000.0))
@@ -238,7 +240,11 @@ def main():
           checkpoint_path = os.path.join(checkpoint_dir,'model_best.pth.tar')
         print (checkpoint_path)
         assert os.path.isfile(checkpoint_path), 'Error: no checkpoint directory found!'
-        checkpoint = torch.load(checkpoint_path)
+
+        if use_cuda:
+            checkpoint = torch.load(checkpoint_path)
+        else:
+            checkpoint = torch.load(checkpoint_path, map_location='cpu')
         best_acc = checkpoint['best_acc']
         start_epoch = checkpoint['epoch']
         model.load_state_dict(checkpoint['state_dict'])

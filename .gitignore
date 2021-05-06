@@ -136,6 +136,7 @@ covid-chestxray-dataset/
 checkpoint/
 checkpoint_first_stage/
 checkpoint_second_stage/
+checkpoint_ensemble/
 standard_data_augmentation_0405/
 standard_data_multiclass_0325/
 standard_data_multiclass_0922_crossentropy/
@@ -151,3 +152,4 @@ results_and_measurements/
 results_first_stage/
 results_whole_dataset_second_stage/
 results_hierarchical/
+results_whole_dataset_first_stage/
