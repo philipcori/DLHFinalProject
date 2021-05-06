@@ -79,7 +79,7 @@ def parse_data_dict(f_dir, cv, runtype):
   all_predict_v = []
   for model in model_list:
    predict_v = []
-   sub_dir = './explore_version_03/results/%s_20200407_multiclass_%s'%(model, cv)
+   sub_dir = f_dir % (model, cv)
    filename = 'result_detail_%s_%s_%s.csv'%(model, runtype, cv)
    print(filename)
    filepath = os.path.join(sub_dir, filename)

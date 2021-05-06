@@ -15,7 +15,7 @@ import torch.utils.data as data
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 #import torchvision.models as models
-import explore_version_03.models.proposedModels.models.ensemble_learning_3classes as models 
+import explore_version_03.models.proposedModels.models.ensemble_learning_3classes as models
 from explore_version_03.data.ensemble_dataset_3classes import EnsembleDataset
 from explore_version_03.data.ensemble_dataset_3classes import EnsembleDatasetSampling
 from explore_version_03.utils import Bar, AverageMeter, accuracy, mkdir_p
@@ -45,7 +45,7 @@ model_names = default_model_names
 parser = argparse.ArgumentParser(description='PyTorch ImageNet Training')
 
 # Experiment ID
-parser.add_argument('--experimentID', default='%s_20200719_gamma_10_multiclass_cv5_focal', type=str, metavar='E_ID',
+parser.add_argument('--experimentID', default='%s_20200719_10_multiclass_cv5_focal', type=str, metavar='E_ID',
                     help='ID of Current experiment')
 parser.add_argument('--cv', default='cv5', type=str, metavar='E_ID',
                     help='ID of Current experiment')
@@ -149,26 +149,36 @@ def main():
     checkpoint_dir = os.path.join(args.checkpoint, experimentID)
     
     # Data loading code
-    train_dataset = EnsembleDataset(args, 'train')
-    train_distri = train_dataset.get_label_distri()
-    train_loader = torch.utils.data.DataLoader(train_dataset,
-                                               batch_size=args.train_batch,
-                                               shuffle=not args.serial_batches,
-                                               num_workers=int(args.workers))
 
-    valid_dataset = EnsembleDataset(args, 'valid')
-    val_loader = torch.utils.data.DataLoader(valid_dataset,
-                                             batch_size=args.test_batch,
-                                             shuffle=False,
-                                             num_workers=args.workers,
-                                             pin_memory=True)
+    if args.test:
+        test_dataset = EnsembleDataset(args, 'test')
+        test_distri = test_dataset.get_label_distri()
+        test_loader = torch.utils.data.DataLoader(test_dataset,
+                                                 batch_size=args.test_batch,
+                                                 shuffle=False,
+                                                 num_workers=args.workers,
+                                                 pin_memory=True)
+    else:
+        test_dataset = EnsembleDataset(args, 'test')
+        test_loader = torch.utils.data.DataLoader(test_dataset,
+                                                  batch_size=args.test_batch,
+                                                  shuffle=False,
+                                                  num_workers=args.workers,
+                                                  pin_memory=True)
 
-    test_dataset = EnsembleDataset(args, 'test')
-    test_loader = torch.utils.data.DataLoader(test_dataset,
-                                             batch_size=args.test_batch,
-                                             shuffle=False,
-                                             num_workers=args.workers,
-                                             pin_memory=True)
+        train_dataset = EnsembleDataset(args, 'train')
+        train_distri = train_dataset.get_label_distri()
+        train_loader = torch.utils.data.DataLoader(train_dataset,
+                                                   batch_size=args.train_batch,
+                                                   shuffle=not args.serial_batches,
+                                                   num_workers=int(args.workers))
+
+        valid_dataset = EnsembleDataset(args, 'valid')
+        val_loader = torch.utils.data.DataLoader(valid_dataset,
+                                                 batch_size=args.test_batch,
+                                                 shuffle=False,
+                                                 num_workers=args.workers,
+                                                 pin_memory=True)
 
     # create model
     if args.pretrained:
@@ -190,9 +200,9 @@ def main():
     print('    Total params: %.2fM' % (sum(p.numel() for p in model.parameters())/1000000.0))
 
     # define loss function (criterion) and optimizer
-    print (train_distri)
+    # print (train_distri)
 #    return
-    criterion = focalloss(gamma=10, label_distri = train_distri, model_name = args.arch, cuda_a = use_cuda)
+    criterion = focalloss(gamma=10, label_distri = test_distri, model_name = args.arch, cuda_a = use_cuda)
 #    criterion = nn.CrossEntropyLoss()
 #    criterion = nn.KLDivLoss()
     optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
