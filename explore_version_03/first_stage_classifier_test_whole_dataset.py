@@ -86,7 +86,7 @@ parser.add_argument('-ck_n', '--checkpoint_saved_n', default=2, type=int, metava
 # Test Outputs
 parser.add_argument('--test', default=False, dest='test', action='store_true',
                     help='evaluate model on test set')
-parser.add_argument('--results', default='./explore_version_03/results_whole_dataset_second_stage', type=str, metavar='PATH',
+parser.add_argument('--results', default='./explore_version_03/results_whole_dataset_first_stage', type=str, metavar='PATH',
                     help='path to save experiment results (default: results)')
 parser.add_argument('-r', '--resume', default='', type=str, metavar='PATH',
                     help='saved model ID for loading checkpoint (default: none)')
