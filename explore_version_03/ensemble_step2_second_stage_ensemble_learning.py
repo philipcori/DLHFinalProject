@@ -160,6 +160,7 @@ def main():
                                                  pin_memory=True)
     else:
         test_dataset = EnsembleDataset(args, 'test')
+        test_distri = test_dataset.get_label_distri()
         test_loader = torch.utils.data.DataLoader(test_dataset,
                                                   batch_size=args.test_batch,
                                                   shuffle=False,
@@ -204,7 +205,7 @@ def main():
     # define loss function (criterion) and optimizer
     # print (train_distri)
 #    return
-    criterion = focalloss(gamma=10, label_distri = test_distri, model_name = args.arch, cuda_a = use_cuda)
+    criterion = focalloss(gamma=3, label_distri = test_distri, model_name = args.arch, cuda_a = use_cuda)
 #    criterion = nn.CrossEntropyLoss()
 #    criterion = nn.KLDivLoss()
     optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)

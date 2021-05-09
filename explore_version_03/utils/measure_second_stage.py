@@ -39,6 +39,8 @@ class MeasureR(object):
                 # print (pv, rv)
                 p_id = np.argmax(pv)
                 t_id = np.argmax(rv)
+                #if t_id > 2:
+                #    continue
                 target_s[t_id] += 1.
                 predict_s[p_id] += 1.
                 if t_id == p_id:
@@ -94,7 +96,7 @@ class MeasureR(object):
 
 
 if __name__ == '__main__':
-    dir1 = './explore_version_03/results/flannel_20200719_gamma_10_multiclass_cv5_focal'
+    dir1 = './explore_version_03/results/flannel_20200719_10_multiclass_cv5_focal'
     #    dir2 = './results/resnet18_20200322_weight_1vs100_1_100_woRegularization'
     #    dir3 = './results/resnet18_20200322_weight_1vs6_15_100_woRegularization_augumentation'
     #    dir4 = './results/resnet18_20200322_weight_1vs6_15_100_woRegularization_stadndard'

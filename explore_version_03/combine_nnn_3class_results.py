@@ -35,7 +35,7 @@ def main():
             else:
                 results.append([0.0,0.0,1.0,0.0] + real_labels)
 
-    with open(dest_results_dir_path, 'w', newline='') as out_file:
+    with open(dest_results_dir_path, 'w+', newline='') as out_file:
         writer = csv.writer(out_file)
         for pred in results:
             writer.writerow(pred)

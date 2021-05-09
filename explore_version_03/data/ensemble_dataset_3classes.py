@@ -8,7 +8,7 @@ from explore_version_03.data.base_dataset import BaseDataset
 # add data augumentation 
 #from torch.utils.data import DataLoader
 
-model_list = ['vgg19_bn', 'densenet161','inception_v3', 'resnet152','resnext101_32x8d']
+model_list = ['vgg19_bn', 'densenet161','inception_v3', 'resnet152']
 run_types = ['train','valid','test']
 
 

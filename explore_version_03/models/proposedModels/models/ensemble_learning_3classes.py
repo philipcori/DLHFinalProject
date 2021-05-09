@@ -64,7 +64,7 @@ class FlannelNet(nn.Module):
         
         self.vectors = Variable(torch.FloatTensor([[1.]]))
 #        self.w_vec = nn.Linear(1, 5, bias=True)
-        self.ew1 = nn.Linear(225, 5, bias=True)
+        self.ew1 = nn.Linear(144, 4, bias=True)
         self.ew2 = nn.Linear(16, 4, bias=True)
         self.ew3 = nn.Linear(420, 128, bias=True)
         self.ew4 = nn.Linear(20, 4, bias=True)
@@ -72,14 +72,17 @@ class FlannelNet(nn.Module):
         self.sm = nn.Softmax(dim=1)
 
     def forward(self, x):
-        zzz = x.split([3,3,3,3,3],1)
+        zzz = x.split([3,3,3,3],1)
         z = torch.stack(zzz, 1)
         L = x.shape[0]
         x1 = x.unsqueeze(-1)
         x2 = x1.permute(0,2,1)
         x3 = torch.matmul(x1,x2)
         x3 = x3.view(L, -1)
+        #print(x3.shape)
         wv = self.sm(self.ew1(x3)).unsqueeze(-1)
+        #print(wv.shape)
+        #print(z.shape)
         v = torch.sum(wv * z, 1)
         return v
 

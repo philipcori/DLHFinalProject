@@ -9,8 +9,8 @@ from sklearn.metrics  import roc_curve,auc
 class MeasureR(object):
     def __init__(self, fdir, loss, acc):
       self.fdir = fdir
-      self.file_path = os.path.join(self.fdir, 'result_detail_resnet152_test_cv5.csv')
-      self.wfile_path = os.path.join(self.fdir, 'measure_detail_resnet152_test_cv5.csv')
+      self.file_path = os.path.join(self.fdir, 'result_detail_resnet152_valid_cv5.csv')
+      self.wfile_path = os.path.join(self.fdir, 'measure_detail_resnet152_valid_cv5.csv')
       
       self.acc = acc
       self.loss = loss
@@ -32,17 +32,17 @@ class MeasureR(object):
         for row in csv_reader:
           #print (row)
           pv = np.array(row[:2])
-          #rv = np.array(row[2:])
+          rv = np.array(row[2:])
           #print(row[:2])
           #print(row[2:])
           #print(int(bool(int(float(row[2]))) or bool(int(float(row[3]))) or bool(int(float(row[4])))))
           #print (pv, rv)
-          if int(bool(int(float(row[2]))) or bool(int(float(row[3]))) or bool(int(float(row[4])))) == 1:
-            t_id = 1
-          else:
-            t_id = 0
+          #if int(bool(int(float(row[2]))) or bool(int(float(row[3]))) or bool(int(float(row[4])))) == 1:
+          #  t_id = 1
+          #else:
+          #  t_id = 0
           p_id = np.argmax(pv)
-          #t_id = np.argmax(rv)
+          t_id = np.argmax(rv)
           #print(p_id, t_id)
           target_s[t_id] += 1.
           predict_s[p_id] += 1.
@@ -51,15 +51,18 @@ class MeasureR(object):
             tp_s[t_id] += 1.
           p0.append(float(row[0]))
           p1.append(float(row[1]))
-          if int(float(row[2])) == 1:
-            l1.append(int(float(row[2])))
-          elif int(float(row[3])) == 1:
-            l1.append(int(float(row[3])))
-          elif int(float(row[4])) == 1:
-            l1.append(int(float(row[4])))
-          else:
-            l1.append(0)
-          l0.append(int(float(row[5])))
+          # if int(float(row[2])) == 1:
+          #   l1.append(int(float(row[2])))
+          # elif int(float(row[3])) == 1:
+          #   l1.append(int(float(row[3])))
+          # elif int(float(row[4])) == 1:
+          #   l1.append(int(float(row[4])))
+          # else:
+          #   l1.append(0)
+          # l0.append(int(float(row[5])))
+          l0.append(float(row[2]))
+          l1.append(float(row[3]))
+
         p0 = np.array(p0)  
         p1 = np.array(p1)
         l0 = np.array(l0)
@@ -98,7 +101,7 @@ class MeasureR(object):
         plt.show()
 
 if __name__ == '__main__':
-    dir1 = './explore_version_03/results_whole_dataset_first_stage/resnet152_20200407_multiclass_cv5'
+    dir1 = './explore_version_03/results/resnet152_20200407_multiclass_cv5'
 #    dir2 = './results/resnet18_20200322_weight_1vs100_1_100_woRegularization'
 #    dir3 = './results/resnet18_20200322_weight_1vs6_15_100_woRegularization_augumentation'
 #    dir4 = './results/resnet18_20200322_weight_1vs6_15_100_woRegularization_stadndard'
