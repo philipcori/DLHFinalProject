@@ -39,10 +39,10 @@ Second-Stage Classifier is trained on distinguishing among 3 classes of non-norm
 
 Predictions results on each individual baseline model will produce three CSV files: ```results_detail_ModelName_train_CrossValidationNumber.csv, results_detail_ModelName_valid_CrossValidationNumber.csv, results_detail_ModelName_test_CrossValidationNumber.csv``` These files are required in training the ensemble FLANNEL model. Generate Predictions according to the following steps
 
-* Test Model vgg19_bn using the following command ```python -m explore_version_03.second_stage_classifier --arch vgg19_bn --epochs 200 --test```
-* Test Model inception_v3 using the following command ```python -m explore_version_03.second_stage_classifier --arch inception_v3 --epochs 200 crop_size 299 --test```
-* Test Model resnet152 using the following command ```python -m explore_version_03.second_stage_classifier --arch resnet152 --epochs 200 --test```
-* Test Model densenet161 using the following command ```python -m explore_version_03.second_stage_classifier --arch densenet161 --epochs 200 --test```
+* Test Model vgg19_bn using the following command ```python -m explore_version_03.second_stage_classifier --arch vgg19_bn --test```
+* Test Model inception_v3 using the following command ```python -m explore_version_03.second_stage_classifier --arch inception_v3 crop_size 299 --test```
+* Test Model resnet152 using the following command ```python -m explore_version_03.second_stage_classifier --arch resnet152 --test```
+* Test Model densenet161 using the following command ```python -m explore_version_03.second_stage_classifier --arch densenet161 --test```
 
 ### ensemble-model Learning
 Train FLANNEL Model using the following command: ```python -m explore_version_03.ensemble_step2_second_stage_ensemble_learning --arch flannel --epochs 40```
