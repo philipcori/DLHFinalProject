@@ -205,8 +205,8 @@ def main():
     # define loss function (criterion) and optimizer
     # print (train_distri)
 #    return
-    criterion = focalloss(gamma=3, label_distri = test_distri, model_name = args.arch, cuda_a = use_cuda)
-#    criterion = nn.CrossEntropyLoss()
+#    criterion = focalloss(gamma=3, label_distri = test_distri, model_name = args.arch, cuda_a = use_cuda)
+    criterion = nn.CrossEntropyLoss()
 #    criterion = nn.KLDivLoss()
     optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 #    optimizer = optim.SGD(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
