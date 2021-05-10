@@ -48,9 +48,19 @@ Predictions results on each individual baseline model will produce three CSV fil
 Train FLANNEL Model using the following command: ```python -m explore_version_03.ensemble_step2_second_stage_ensemble_learning --arch flannel --epochs 40```
 
 ### Predicting and combining the results
+After training the First-Stage Classifier and FLANNEL ensemble model on the second stage baseline classifiers, you will now have two ```model.best``` files representing the best parameters learned for the first and the second classifiers respectively.
+
+We will now run predictions on 4-class preprocessed data using ```model.best``` files for each classifier seperately:
+
+1. For the first-stage classifier, run the follwoing command: ```python -m explore_version_03.first_stage_classifier_test_whole_dataset --arch restnet152 --test```
+2. For the second-stage classifier, run the follwoing command: ```python -m explore_version_03.second_stage_classifier_test_whole_dataset --arch flannel --test```
+
+Now, run the final step by combining the results of the above two scripts:
+
+* ```python -m explore_version_03.combine_nnn_3class_results```
 
 
-
+NOTE: To get Precision, Recall, and AUC curves for individual models, you can run the following files ```explore_version_03/utils/measure.py, explore_version_03/utils/measure_second_stage.py, explore_version_03/utils/measure_first_stage.py``` for 4-class, 3-class, and 2-class results respectively.
 
 ## Codes for
 @misc{ 
